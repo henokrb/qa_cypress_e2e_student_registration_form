@@ -1,103 +1,53 @@
-/// <reference types="cypress" />
+/// <reference types='cypress' />
 
-import { faker } from '@faker-js/faker';
-
-describe('Student Registration Page', () => {
-  const student = {
-    firstName: faker.person.firstName(),
-    lastName: faker.person.lastName(),
-    email: faker.internet.email(),
-    mobile: faker.string.numeric(10),
-    address: faker.location.streetAddress(),
-    gender: 'Male',
-    dateOfBirth: {
-      day: '01',
-      month: 'January',
-      year: '2000',
-      formatted: '01 January,2000'
-    },
-    subjects: 'Computer Science',
-    hobbies: 'Sports',
-    state: 'NCR',
-    city: 'Delhi'
-  };
-
-  const expectedModalData = [
-    {
-      label: 'Student Name',
-      value: `${student.firstName} ${student.lastName}`
-    },
-    { label: 'Student Email', value: student.email },
-    { label: 'Gender', value: student.gender },
-    { label: 'Mobile', value: student.mobile },
-    { label: 'Date of Birth', value: student.dateOfBirth.formatted },
-    { label: 'Subjects', value: student.subjects },
-    { label: 'Hobbies', value: student.hobbies },
-    { label: 'Address', value: student.address },
-    { label: 'State and City', value: `${student.state} ${student.city}` }
-  ];
-
-  const selectors = {
-    firstName: '#firstName',
-    lastName: '#lastName',
-    email: '#userEmail',
-    genderMaleLabel: 'label[for="gender-radio-1"]',
-    mobile: '#userNumber',
-    dateOfBirthInput: '#dateOfBirthInput',
-    monthSelect: '.react-datepicker__month-select',
-    yearSelect: '.react-datepicker__year-select',
-    subjects: '#subjectsInput',
-    hobbiesSportsLabel: 'label[for="hobbies-checkbox-1"]',
-    address: '#currentAddress',
-    stateDropdown: '#state',
-    cityDropdown: '#city',
-    stateOption: '#react-select-3-option-0',
-    cityOption: '#react-select-4-option-0',
-    submit: '#submit',
-    modal: '.modal-content',
-    table: 'table'
-  };
-
-  const selectDateOfBirth = ({ day, month, year }) => {
-    cy.get(selectors.dateOfBirthInput).click();
-    cy.get(selectors.monthSelect).select(month);
-    cy.get(selectors.yearSelect).select(year);
-    cy.get(`.react-datepicker__day--0${day}`)
-      .not('.react-datepicker__day--outside-month')
-      .first()
-      .click();
-  };
+describe('Student Registration page', () => {
+  const firstName = 'Jan';
+  const lastName = 'Kowalski';
+  const email = 'jan.kowalski@example.com';
+  const mobile = '1234567890';
+  const address = 'Ulica Testowa 123';
 
   beforeEach(() => {
-    cy.visit('https://demoqa.com/automation-practice-form', {
-      timeout: 1800000
-    });
+    cy.visit('/automation-practice-form');
   });
 
-  it('fills the form and verifies submitted data in modal', () => {
-    cy.get(selectors.firstName).type(student.firstName);
-    cy.get(selectors.lastName).type(student.lastName);
-    cy.get(selectors.email).type(student.email);
-    cy.get(selectors.genderMaleLabel).click();
-    cy.get(selectors.mobile).type(student.mobile);
+  it('should fill the form and verify the modal data', () => {
+    cy.get('#firstName').type(firstName);
+    cy.get('#lastName').type(lastName);
+    cy.get('#userEmail').type(email);
+    cy.get('label[for="gender-radio-1"]').click();
+    cy.get('#userNumber').type(mobile);
+    cy.get('#dateOfBirthInput').click();
+    cy.get('.react-datepicker__month-select').select('January');
+    cy.get('.react-datepicker__year-select').select('2000');
+    cy.get('.react-datepicker__day--001:first').click();
+    cy.get('#subjectsInput').type('Computer Science{enter}');
+    cy.get('label[for="hobbies-checkbox-1"]').click();
+    cy.get('#currentAddress').type(address);
+    cy.get('#state').click();
+    cy.contains('#react-select-3-option-0', 'NCR').click();
+    cy.get('#city').click();
+    cy.contains('#react-select-4-option-0', 'Delhi').click();
+    cy.get('#submit').click();
 
-    selectDateOfBirth(student.dateOfBirth);
-
-    cy.get(selectors.subjects).type(`${student.subjects}{enter}`);
-    cy.get(selectors.hobbiesSportsLabel).click();
-    cy.get(selectors.address).type(student.address);
-
-    cy.get(selectors.stateDropdown).click();
-    cy.contains(selectors.stateOption, student.state).click();
-
-    cy.get(selectors.cityDropdown).click();
-    cy.contains(selectors.cityOption, student.city).click();
-
-    cy.get(selectors.submit).click();
-
-    cy.get(selectors.modal).should('be.visible');
-    expectedModalData.forEach(({ label, value }) => {
-      cy.get(selectors.table).contains(label).next().should('contain', value);
-    });
+    cy.get('.modal-content').should('be.visible');
+    cy.get('table').contains('Student Name').next().should('contain', `${firstName} ${lastName}`);
+    cy.get('table').contains('Student Email').next().should('contain', email);
+    cy.get('table').contains('Gender').next().should('contain', 'Male');
+    cy.get('table').contains('Mobile').next().should('contain', mobile);
+    cy
+      .get('table')
+      .contains('Date of Birth')
+      .next().should('contain', '01 January,2000');
+    cy
+      .get('table')
+      .contains('Subjects')
+      .next().should('contain', 'Computer Science');
+    cy.get('table').contains('Hobbies').next().should('contain', 'Sports');
+    cy.get('table').contains('Address').next().should('contain', address);
+    cy
+      .get('table')
+      .contains('State and City')
+      .next().should('contain', 'NCR Delhi');
   });
 });
