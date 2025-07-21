@@ -88,16 +88,10 @@ describe('Student Registration Page', () => {
     cy.get(selectors.address).type(student.address);
 
     cy.get(selectors.stateDropdown).click();
-    // cy.contains(selectors.stateOption, student.state).click();
-    cy.get(selectors.stateOptionsContainer) // Use the container for options
-      .contains(student.state)
-      .click();
+    cy.contains(selectors.stateOption, student.state).click();
 
     cy.get(selectors.cityDropdown).click();
-    // cy.contains(selectors.cityOption, student.city).click();
-    cy.get(selectors.cityOptionsContainer)
-      .contains(student.city)
-      .click();
+    cy.contains(selectors.cityOption, student.city).click();
 
     cy.get(selectors.submit).click();
 
